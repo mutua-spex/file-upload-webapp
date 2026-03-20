@@ -1,0 +1,6 @@
+kivy==2.2.1
+kivy-garden
+websocket-client
+requests
+pillow
+plyer

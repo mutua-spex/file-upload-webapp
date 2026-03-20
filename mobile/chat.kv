@@ -1,0 +1,128 @@
+#:import Factory kivy.factory.Factory
+
+<ChatScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 8
+        spacing: 8
+
+        BoxLayout:
+            size_hint_y: None
+            height: '40dp'
+            spacing: 8
+            Button:
+                text: 'Back'
+                size_hint_x: None
+                width: '80dp'
+                on_release: root.manager.current = 'rooms'
+            Label:
+                text: root.room_name
+                bold: True
+            Button:
+                text: 'Users'
+                size_hint_x: None
+                width: '80dp'
+                on_release: root.show_presence()
+
+        ScrollView:
+            id: scroll
+            BoxLayout:
+                id: messages_box
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 6
+
+        BoxLayout:
+            size_hint_y: None
+            height: '48dp'
+            spacing: 8
+            TextInput:
+                id: message_input
+                multiline: False
+                hint_text: 'Type a message...'
+                on_text_validate: root.send_message(message_input.text); message_input.text = ''
+            Button:
+                text: '📎'
+                size_hint_x: None
+                width: '40dp'
+                on_release: root.pick_file()
+            Button:
+                text: 'Send'
+                size_hint_x: None
+                width: '80dp'
+                on_release: root.send_message(message_input.text); message_input.text = ''
+
+<RoomsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 8
+        spacing: 8
+
+        BoxLayout:
+            size_hint_y: None
+            height: '42dp'
+            spacing: 8
+            Label:
+                text: 'Rooms'
+                bold: True
+            Button:
+                text: 'Refresh'
+                size_hint_x: None
+                width: '90dp'
+                on_release: root.load_rooms()
+
+        ScrollView:
+            BoxLayout:
+                id: rooms_box
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 6
+
+        BoxLayout:
+            size_hint_y: None
+            height: '48dp'
+            spacing: 8
+            TextInput:
+                id: new_room_name
+                hint_text: 'New room name'
+                multiline: False
+            Button:
+                text: 'Create'
+                size_hint_x: None
+                width: '90dp'
+                on_release: root.create_room(new_room_name.text); new_room_name.text = ''
+
+<LoginScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 16
+        spacing: 12
+
+        Label:
+            text: 'ChatApp'
+            font_size: '32sp'
+            bold: True
+            size_hint_y: None
+            height: '50dp'
+
+        TextInput:
+            id: username
+            hint_text: 'Username'
+            multiline: False
+
+        TextInput:
+            id: password
+            hint_text: 'Password'
+            multiline: False
+            password: True
+
+        BoxLayout:
+            spacing: 8
+            Button:
+                text: 'Login'
+                on_release: root.login(username.text, password.text)
+            Button:
+                text: 'Register'
+                on_release: root.register(username.text, password.text)

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  backend:
+    # Use image pushed to GHCR in production. For local testing you can uncomment the build section below.
+    image: ghcr.io/mutua-spex/file-upload-webapp:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    restart: always
+    environment:
+      - CHATAPP_SECRET_KEY=${CHATAPP_SECRET_KEY}
+      - DATABASE_URL=sqlite:////data/chatapp.db
+    volumes:
+      - ./backend/static:/app/backend/static:rw
+      - data:/data
+    networks:
+      - web
+
+  nginx:
+    image: nginx:stable
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/chatapp.conf:/etc/nginx/conf.d/default.conf:ro
+      - certs:/etc/letsencrypt
+      - webroot:/var/www/certbot
+    depends_on:
+      - backend
+    networks:
+      - web
+
+  certbot:
+    image: certbot/certbot
+    restart: "no"
+    volumes:
+      - certs:/etc/letsencrypt
+      - webroot:/var/www/certbot
+    entrypoint: ""
+    networks:
+      - web
+
+  certbot-renew:
+    image: certbot/certbot
+    restart: unless-stopped
+    command: sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --deploy-hook 'nginx -s reload' || true; sleep 12h; done"
+    volumes:
+      - certs:/etc/letsencrypt
+      - webroot:/var/www/certbot
+    networks:
+      - web
+
+volumes:
+  certs:
+  webroot:
+  data:
+
+
+networks:
+  web:
+    driver: bridge

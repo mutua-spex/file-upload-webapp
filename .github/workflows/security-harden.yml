@@ -1,0 +1,17 @@
+name: Security Harden Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  lint-cors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check CORS config is not wildcard
+        run: |
+          if grep -R "allow_origins=\[\"*\"\]" backend || grep -R "allow_origins=\[\*\]" backend; then
+            echo "CORS is configured with wildcard. Please restrict in production."; exit 1
+          else
+            echo "CORS appears restricted or not using wildcard";
+          fi
